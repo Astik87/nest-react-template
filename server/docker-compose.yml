@@ -1,0 +1,70 @@
+name: naos
+
+services:
+  dev:
+    container_name: 'naos-dev'
+    networks:
+      - server
+    build:
+      target: dev
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+      - 4000:4000
+      - 9229:9229
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  prod:
+    container_name: 'naos-prod'
+    networks:
+      - server
+    build:
+      target: prod
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+      - 4000:4000
+      - 9229:9229
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  debug:
+    container_name: 'naos-debug'
+    networks:
+      - server
+    build:
+      target: debug
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+      - 4000:4000
+      - 9229:9229
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  database:
+    container_name: 'naos-postgres'
+    image: postgres:14.12-alpine
+    networks:
+      - server
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PORT: ${DB_PORT}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+
+networks:
+  server:
